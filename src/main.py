@@ -19,11 +19,11 @@ def main():
     # totcost, output, plabor, pfuel, pkap
     nervlove_data = data['NervloveData']
 
-    # model = exercise1(nervlove_data, True)
-    # exercise2(nervlove_data, model, True)
-    # exercise3(model)
-    # exercise4(nervlove_data, model)
-    # exercise5(nervlove_data, True)
+    model = exercise1(nervlove_data, True)
+    exercise2(nervlove_data, model, True)
+    exercise3(model)
+    exercise4(nervlove_data, model)
+    exercise5(nervlove_data, True)
     exercise6(nervlove_data)
 
 
