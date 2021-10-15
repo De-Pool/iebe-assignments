@@ -162,18 +162,20 @@ def exercise5(data, print_all):
         print(ols_model_fit.summary())
 
 
-def exercise6(data):
+def exercise6(data, print_all):
     subsample1 = data[:29]
     subsample2 = data[29:29 * 2]
     subsample3 = data[29 * 2:29 * 3]
     subsample4 = data[29 * 3:29 * 4]
     subsample5 = data[29 * 4:]
 
-    print('Subsample 1\n', subsample1.describe(), '\n')
-    print('Subsample 2\n', subsample2.describe(), '\n')
-    print('Subsample 3\n', subsample3.describe(), '\n')
-    print('Subsample 4\n', subsample4.describe(), '\n')
-    print('Subsample 5\n', subsample5.describe(), '\n')
+    if print_all:
+        print('Exercise 6')
+        print('Subsample 1\n', subsample1.describe(), '\n')
+        print('Subsample 2\n', subsample2.describe(), '\n')
+        print('Subsample 3\n', subsample3.describe(), '\n')
+        print('Subsample 4\n', subsample4.describe(), '\n')
+        print('Subsample 5\n', subsample5.describe(), '\n')
 
 
 def log(x):
