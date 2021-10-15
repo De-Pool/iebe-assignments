@@ -7,6 +7,7 @@ import statsmodels.formula.api as smf
 import statsmodels.stats.diagnostic as stats
 import pylab
 
+import pandas as pd
 import numpy as np
 import numpy.linalg as linalg
 import matplotlib.pyplot as plt
@@ -18,9 +19,12 @@ def main():
     # totcost, output, plabor, pfuel, pkap
     nervlove_data = data['NervloveData']
 
-    model = exercise1(nervlove_data, True)
-    exercise2(nervlove_data, model, True)
-    exercise3(model)
+    # model = exercise1(nervlove_data, True)
+    # exercise2(nervlove_data, model, True)
+    # exercise3(model)
+    # exercise4(nervlove_data, model)
+    # exercise5(nervlove_data, True)
+    exercise6(nervlove_data)
 
 
 def exercise1(data, print_all):
@@ -46,6 +50,7 @@ def exercise1(data, print_all):
     # so we can conclude heteroskedasticity is present.
     _, _, _, fpvalue = stats.het_breuschpagan(ols_model_fit.resid, ols_model_fit.model.exog)
     if print_all:
+        print('Exercise 1')
         print(ols_model_fit.summary(), '\n')
         print(ols_model_residuals.f_test(np.identity(4)), '\n')
         print('p-value breusch pagan', fpvalue, '\n')
@@ -89,14 +94,15 @@ def exercise2(data, model, print_all):
     F = ((R @ B_hat - r) * (R @ B_hat - r)) / (R @ var_b @ R.T)
 
     if print_all:
+        print('Exercise 2')
         print('output, plabor', output_plabor_corr[0][1])
         print('output, pfuel', output_pfuel_corr[0][1])
         print('output, pkap', output_pkap_corr[0][1])
         print('plabor, pfuel', plabor_pfuel_corr[0][1])
         print('plabor, pkap', plabor_pkap_corr[0][1])
-        print('pfuel, pkap', pfuel_pkap_corr[0][1])
-        print('heteroskedasticity-robust standard error t-statistic', t_hc_robust)
-        print('F-statistic', F)
+        print('pfuel, pkap', pfuel_pkap_corr[0][1], '\n')
+        print('heteroskedasticity-robust standard error t-statistic', t_hc_robust, '\n')
+        print('F-statistic', F, '\n')
 
     return F
 
@@ -108,7 +114,7 @@ def exercise3(model):
     residuals = model_fit.resid.values
     fitted_values = model_fit.fittedvalues.values
     plt.scatter(fitted_values, residuals)
-    plt.title("Residuals plotted against the fitted values")
+    plt.title("Residuals plotted against the fitted values (Question 1 model)")
     plt.xlabel("Fitted values")
     plt.ylabel("Residuals")
     plt.show()
@@ -118,8 +124,64 @@ def exercise3(model):
     pylab.show()
 
 
+def exercise4(data, model):
+    model_fit = model.fit()
+
+    # Plot the residuals against the fitted values
+    residuals = model_fit.resid.values
+    log_q = log(data['output'])
+    plt.scatter(log_q, residuals)
+    plt.title("Residuals plotted against log(Q) (Question 1 model)")
+    plt.xlabel("log(Q)")
+    plt.ylabel("Residuals")
+    plt.show()
+
+
+def exercise5(data, print_all):
+    # Each variable in the formula is a key in the input data
+    # Each variable can be transformed by a Python function
+    formula = 'log(totcost) ~ 1 + log(output) + log_squared(output) + log(plabor) + log(pfuel) + log(pkap)'
+    ols_model = smf.ols(formula=formula, data=data)
+    ols_model_fit = ols_model.fit()
+
+    # Plot the residuals against the fitted values
+    residuals = ols_model_fit.resid.values
+    fitted_values = ols_model_fit.fittedvalues.values
+    plt.scatter(fitted_values, residuals)
+    plt.title("Residuals plotted against the fitted values (Question 5 model)")
+    plt.xlabel("Fitted values")
+    plt.ylabel("Residuals")
+    plt.show()
+
+    # QQ plot
+    sm.qqplot(residuals, line='45')
+    pylab.show()
+
+    if print_all:
+        print('Exercise 5')
+        print(ols_model_fit.summary())
+
+
+def exercise6(data):
+    subsample1 = data[:29]
+    subsample2 = data[29:29 * 2]
+    subsample3 = data[29 * 2:29 * 3]
+    subsample4 = data[29 * 3:29 * 4]
+    subsample5 = data[29 * 4:]
+
+    print('Subsample 1\n', subsample1.describe(), '\n')
+    print('Subsample 2\n', subsample2.describe(), '\n')
+    print('Subsample 3\n', subsample3.describe(), '\n')
+    print('Subsample 4\n', subsample4.describe(), '\n')
+    print('Subsample 5\n', subsample5.describe(), '\n')
+
+
 def log(x):
     return np.log(x)
+
+
+def log_squared(x):
+    return np.square(np.log(x))
 
 
 if __name__ == '__main__':
