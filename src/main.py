@@ -24,7 +24,7 @@ def main():
     exercise3(model)
     exercise4(nervlove_data, model)
     exercise5(nervlove_data, True)
-    exercise6(nervlove_data)
+    exercise6(nervlove_data, True)
 
 
 def exercise1(data, print_all):
