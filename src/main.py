@@ -7,7 +7,6 @@ import statsmodels.formula.api as smf
 import statsmodels.stats.diagnostic as stats
 import pylab
 
-import pandas as pd
 import numpy as np
 import numpy.linalg as linalg
 import matplotlib.pyplot as plt
@@ -34,16 +33,10 @@ def exercise1(data, print_all):
     ols_model = smf.ols(formula=formula, data=data)
     ols_model_fit = ols_model.fit()
 
-    # We can show unbiasedness by:
-    # 1. E[u|X] = 0 --> using the omnibus test we can regress on the residuals by doing:
-    # u ~ BX.
-    # We don't use an intercept, because the mean should be 0 given X.
-    # if the F-test statistic is not significant, none of the variables explain the error, so then E[u|X] holds.
-    # else the assumption E[u|X] does not hold.
-    # 2. E[u'u|X] = I*sigma^squared --> show the presence of homoskedasticity
+    # E[u'u|X] = I*sigma^squared --> show the presence of homoskedasticity
     data['u'] = ols_model_fit.resid
-    formula_residuals = 'u ~ log(output) + log(plabor) + log(pfuel) + log(pkap) - 1'
-    ols_model_residuals = smf.ols(formula=formula_residuals, data=data).fit()
+    # formula_residuals = 'u ~ log(output) + log(plabor) + log(pfuel) + log(pkap) - 1'
+    # ols_model_residuals = smf.ols(formula=formula_residuals, data=data).fit()
 
     # Null hypothesis of the Breusch Pagan test is the presence of homoskedasticity
     # if the pvalue is less than 0.05, we reject the null hypothesis,
@@ -52,7 +45,6 @@ def exercise1(data, print_all):
     if print_all:
         print('Exercise 1')
         print(ols_model_fit.summary(), '\n')
-        print(ols_model_residuals.f_test(np.identity(4)), '\n')
         print('p-value breusch pagan', fpvalue, '\n')
 
     return ols_model
@@ -101,7 +93,7 @@ def exercise2(data, model, print_all):
         print('plabor, pfuel', plabor_pfuel_corr[0][1])
         print('plabor, pkap', plabor_pkap_corr[0][1])
         print('pfuel, pkap', pfuel_pkap_corr[0][1], '\n')
-        print('heteroskedasticity-robust standard error t-statistic', t_hc_robust, '\n')
+        print('heteroskedasticity-robust standard error t-statistic\n', t_hc_robust, '\n')
         print('F-statistic', F, '\n')
 
     return F
