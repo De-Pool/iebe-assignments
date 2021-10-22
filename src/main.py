@@ -25,6 +25,10 @@ def main():
     exercise4(nervlove_data, model)
     exercise5(nervlove_data, True)
     exercise6(nervlove_data, True)
+    exercise7(nervlove_data, True)
+    dummy_data = exercise8(nervlove_data, True)
+    exercise9(dummy_data, True)
+
 
 
 def exercise1(data, print_all):
@@ -180,6 +184,76 @@ def exercise6(data, print_all):
         print('Subsample 3\n', subsample3.describe(), '\n')
         print('Subsample 4\n', subsample4.describe(), '\n')
         print('Subsample 5\n', subsample5.describe(), '\n')
+
+
+def exercise7(data, print_all):
+    if print_all:
+        print('exercise 7 \n')
+
+    # the formula for the regression
+    formula = 'log(totcost) ~ 1 + log(output) + log(plabor) + log(pfuel) + log(pkap)'
+
+    # fit the above regression formula for each subsample,
+    # return its error variance and the estimated coefficients
+    for i, j in zip(range(0, 117, 29), range(1, 6)):
+        subsample = data[i:i + 29]
+        ols_model = smf.ols(formula=formula, data=subsample)
+        ols_model_fit = ols_model.fit()
+
+        if print_all:
+            print('subsample {} \n'.format(j))
+            print('estimated error variance:')
+            print(np.square(np.std(ols_model_fit.resid)), '\n')
+            print('estimated coefficients:')
+            print(ols_model_fit.params, '\n')
+
+
+def exercise8(data, print_all):
+    # add group column to data and convert to dummy variables to use in regression
+
+    df = data
+    df['g'] = np.concatenate([[1] * 29, [2] * 29, [3] * 29, [4] * 29, [5] * 29])
+    df_dummy = pd.get_dummies(df['g'], prefix="g")
+    column_name = df.columns.values.tolist()
+    column_name.remove('g')
+    df = df[column_name].join(df_dummy)
+
+    # the formula with dummy variables per group
+    formula = 'log(totcost) ~ g_1 + g_1:log(output) + g_1:log(plabor) + g_1:log(pfuel)+ g_1:log(pkap)\
+    + g_2 + g_2:log(output) + g_2:log(plabor) + g_2:log(pfuel) + g_2:log(pkap)\
+    + g_3 + g_3:log(output) + g_3:log(plabor) + g_3:log(pfuel) + g_3:log(pkap)\
+    +g_4 + g_4:log(output) + g_4:log(plabor) + g_4:log(pfuel) + g_4:log(pkap)\
+    + g_5 + g_5:log(output) + g_5:log(plabor) + g_5:log(pfuel) + g_5:log(pkap) -1'
+
+    # fit OLS regression model with the above formula
+    ols_model = smf.ols(formula=formula, data=df)
+    ols_model_fit = ols_model.fit()
+
+    if print_all:
+        print('exercise 8 \n')
+        print('estimated eror variance:')
+        print(np.square(np.std(ols_model_fit.resid)), '\n')
+        print('estimated coefficients:')
+        print(ols_model_fit.params)
+
+    return df
+
+
+def exercise9(data, print_all):
+    # regression formula with different intercepts and log(output) coeffs across groups,
+    # but the same coeffs for the other variables
+    formula = 'log(totcost) ~ g_1 + g_1:log(output)  + g_2 + g_2:log(output) +\
+    g_3 + g_3:log(output) + g_4 + g_4:log(output) + g_5 + g_5:log(output) +\
+    log(plabor) + log(pfuel) + log(pkap) - 1'
+
+    ols_model = smf.ols(formula=formula, data=data)
+    ols_model_fit = ols_model.fit()
+
+    # what to return here, no question?????????///
+    if print_all:
+        print('exercise 9 \n')
+        #         print(np.square(np.std(ols_model_fit.resid)))
+        print(ols_model_fit.summary())
 
 
 def log(x):
