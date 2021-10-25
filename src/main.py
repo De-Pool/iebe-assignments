@@ -28,7 +28,7 @@ def main():
     exercise7(nervlove_data, True)
     dummy_data = exercise8(nervlove_data, True)
     exercise9(dummy_data, True)
-
+    exercise10(dummy_data, True)
 
 
 def exercise1(data, print_all):
@@ -132,14 +132,20 @@ def exercise4(data, model):
     model_fit = model.fit()
 
     data['residuals'] = model_fit.resid.values
-    data['log_q'] = log(data['output'])
+    data['log_q_s'] = log((log_squared(data['output'])))
+    data['log_q'] = (data['output'])
 
     # Plot the residuals against log(Q)
-    sns.lmplot(x="log_q", y="residuals", data=data, height=5, aspect=1.5, truncate=False, order=2)
-    plt.scatter(data['log_q'], data['residuals'])
     plt.title("Residuals plotted against log(Q) (Question 1 model)")
     plt.xlabel("log(Q)")
     plt.ylabel("Residuals")
+
+    sns.lmplot(x="log_q", y="residuals", data=data, height=5, aspect=1.5, truncate=False, order=2)
+    plt.scatter(data['log_q'], data['residuals'])
+    plt.show()
+
+    sns.lmplot(x="log_q_s", y="residuals", data=data, height=5, aspect=1.5, truncate=False, order=1)
+    plt.scatter(data['log_q_s'], data['residuals'])
     plt.show()
 
 
@@ -200,6 +206,7 @@ def exercise7(data, print_all):
         ols_model = smf.ols(formula=formula, data=subsample)
         ols_model_fit = ols_model.fit()
 
+        # print the subsample with its estimated error variance and estimated coefficients
         if print_all:
             print('subsample {} \n'.format(j))
             print('estimated error variance:')
@@ -210,7 +217,6 @@ def exercise7(data, print_all):
 
 def exercise8(data, print_all):
     # add group column to data and convert to dummy variables to use in regression
-
     df = data
     df['g'] = np.concatenate([[1] * 29, [2] * 29, [3] * 29, [4] * 29, [5] * 29])
     df_dummy = pd.get_dummies(df['g'], prefix="g")
@@ -229,6 +235,7 @@ def exercise8(data, print_all):
     ols_model = smf.ols(formula=formula, data=df)
     ols_model_fit = ols_model.fit()
 
+    # return the estimated coefficients of the model and the estimated error variance
     if print_all:
         print('exercise 8 \n')
         print('estimated eror variance:')
@@ -249,11 +256,45 @@ def exercise9(data, print_all):
     ols_model = smf.ols(formula=formula, data=data)
     ols_model_fit = ols_model.fit()
 
-    # what to return here, no question?????????///
+    # return the summary of the found model
     if print_all:
         print('exercise 9 \n')
         #         print(np.square(np.std(ols_model_fit.resid)))
         print(ols_model_fit.summary())
+        print('\n')
+
+
+def exercise10(data, print_all):
+    # search processes were executed manually, these are the final models found with the said techniques
+
+    # forward search
+    # foward search final model, all coeffs significant at the 5% level.
+    formula1 = 'log(totcost) ~ log_squared(output) + pfuel'
+
+    # fit the model and get results
+    ols_model1 = smf.ols(formula=formula1, data=data)
+    ols_model_fit1 = ols_model1.fit()
+
+    # backwards search
+    # backward search final model, all coeffs significant at the 5% level.
+    formula2 = 'log(totcost) ~ log(pkap) + log_squared(output) + output + plabor+ output:plabor + pfuel:plabor - 1'
+
+    # fit the model and get results
+    ols_model2 = smf.ols(formula=formula2, data=data)
+    ols_model_fit2 = ols_model2.fit()
+
+    # print the model summaries and plot the residuals
+    if print_all:
+        print('exercise 10')
+        print("model 1, forward search, final model results, and plot of the residuals \n \n")
+        print(ols_model_fit1.summary())
+        plt.scatter(np.arange(len(ols_model_fit1.resid)), ols_model_fit1.resid)
+        plt.show()
+
+        print("model 2, backward search, final model results, and plot of the residuals \n \n")
+        print(ols_model_fit2.summary())
+        plt.scatter(np.arange(len(ols_model_fit2.resid)), ols_model_fit2.resid)
+        plt.show()
 
 
 def log(x):
